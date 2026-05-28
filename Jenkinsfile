@@ -48,7 +48,11 @@ pipeline {
 
         stage('Generate Allure Report') {
             steps {
-                bat 'allure generate target/allure-results -o target/allure-report --clean'
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'target/allure-results']]
+                ])
             }
         }
 
