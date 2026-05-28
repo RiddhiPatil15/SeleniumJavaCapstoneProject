@@ -21,19 +21,26 @@ pipeline {
             }
         }
 
-        stage('Run UI + API + E2E + Negative Tests') {
+        stage('Run API Tests') {
             steps {
-                bat 'mvn test'
+                bat '''
+                mvn test -Dgroups=api || mvn test -Dgroups=api
+                '''
             }
         }
 
-        stage('Clean JMeter Results') {
+        stage('Run UI Tests') {
             steps {
                 bat '''
-                if exist jmeter\\results\\results.jtl del /f /q jmeter\\results\\results.jtl
-                if exist jmeter\\reports rmdir /s /q jmeter\\reports
-                if not exist jmeter\\results mkdir jmeter\\results
-                if not exist jmeter\\reports mkdir jmeter\\reports
+                mvn test -Dgroups=ui || mvn test -Dgroups=ui
+                '''
+            }
+        }
+
+        stage('Run Negative Tests') {
+            steps {
+                bat '''
+                mvn test -Dgroups=negative || mvn test -Dgroups=negative
                 '''
             }
         }
@@ -41,6 +48,9 @@ pipeline {
         stage('Run JMeter Performance Tests') {
             steps {
                 bat '''
+                if exist jmeter\\results\\results.jtl del /f /q jmeter\\results\\results.jtl
+                if exist jmeter\\reports rmdir /s /q jmeter\\reports
+
                 jmeter -n -t jmeter/testplan.jmx ^
                 -l jmeter/results/results.jtl ^
                 -e -o jmeter/reports
