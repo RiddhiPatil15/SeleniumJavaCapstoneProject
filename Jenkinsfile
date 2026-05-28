@@ -24,7 +24,7 @@ pipeline {
         stage('Run API Tests') {
             steps {
                 bat '''
-                mvn test -Dgroups=api || mvn test -Dgroups=api
+                mvn test -DsuiteXmlFile=src/test/resources/testng.xml
                 '''
             }
         }
@@ -32,7 +32,7 @@ pipeline {
         stage('Run UI Tests') {
             steps {
                 bat '''
-                mvn test -Dgroups=ui || mvn test -Dgroups=ui
+                mvn test -DsuiteXmlFile=src/test/resources/testng.xml
                 '''
             }
         }
@@ -40,7 +40,7 @@ pipeline {
         stage('Run Negative Tests') {
             steps {
                 bat '''
-                mvn test -Dgroups=negative || mvn test -Dgroups=negative
+                mvn test -DsuiteXmlFile=src/test/resources/testng.xml
                 '''
             }
         }
@@ -85,9 +85,10 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'target/surefire-reports/**', fingerprint: true
+            archiveArtifacts artifacts: 'target/allure-results/**', fingerprint: true
             archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
-            archiveArtifacts artifacts: 'jmeter/reports/**', fingerprint: true
             archiveArtifacts artifacts: 'jmeter/results/**', fingerprint: true
+            archiveArtifacts artifacts: 'jmeter/reports/**', fingerprint: true
         }
 
         success {
